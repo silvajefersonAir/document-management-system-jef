@@ -25,6 +25,11 @@ class DocumentController {
 
       res.download(filePath, document.originalName, (error) => {
         if (error && !res.headersSent) {
+          if (error.code === 'ENOENT') {
+            error.status = 404;
+            error.code = 'DOCUMENT_NOT_FOUND';
+            error.message = 'Arquivo não encontrado.';
+          }
           next(error);
         }
       });

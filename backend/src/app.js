@@ -12,13 +12,14 @@
 
 const express = require('express');
 const multer = require('multer');
-const documentRoutes = require('./routes/documentRoutes');
+const createDocumentRouter = require('./routes/documentRoutes');
+const { createDocumentModule } = require('./documentModule');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(documentRoutes);
+app.use(createDocumentRouter(createDocumentModule()));
 
 // Endpoint de verificação de saúde. As demais rotas (/upload, /documents,
 // /documents/:id/download) serão implementadas durante o Passo 2.

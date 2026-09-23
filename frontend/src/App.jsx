@@ -17,7 +17,21 @@ export default function App() {
     async function loadDocuments() {
       try {
         const loadedDocuments = await listDocuments(USER_ID);
-        if (isMounted) setDocuments(loadedDocuments);
+        if (isMounted) {
+          setDocuments((currentDocuments) => {
+            const documentsById = new Map(
+              loadedDocuments.map((document) => [document.id, document]),
+            );
+
+            currentDocuments.forEach((document) => {
+              documentsById.set(document.id, document);
+            });
+
+            return [...documentsById.values()].sort(
+              (first, second) => new Date(second.uploadedAt) - new Date(first.uploadedAt),
+            );
+          });
+        }
       } catch (error) {
         if (isMounted) setErrorMessage(error.message);
       } finally {

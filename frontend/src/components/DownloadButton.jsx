@@ -15,8 +15,11 @@ export default function DownloadButton({ document, userId = 'anonymous' }) {
       const link = window.document.createElement('a');
       link.href = objectUrl;
       link.download = result.fileName || document.originalName;
+      link.style.display = 'none';
+      window.document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(objectUrl);
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {

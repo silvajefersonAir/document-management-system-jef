@@ -13,7 +13,7 @@ class DocumentService {
 
     const document = {
       id: crypto.randomUUID(),
-      originalName: file.originalname,
+      originalName: this.sanitizeOriginalName(file.originalname),
       storedName: file.filename,
       size: file.size,
       mimeType: file.mimetype,
@@ -21,7 +21,12 @@ class DocumentService {
       owner,
     };
 
-    return this.toPublicDocument(this.documentRepository.create(document));
+    try {
+      return this.toPublicDocument(this.documentRepository.create(document));
+    } catch (error) {
+      this.fileRepository.remove({ storedName: file.filename });
+      throw error;
+    }
   }
 
   listDocuments(owner) {
@@ -54,6 +59,15 @@ class DocumentService {
   toPublicDocument(document) {
     const { storedName, ...publicDocument } = document;
     return publicDocument;
+  }
+
+  sanitizeOriginalName(originalName) {
+    const sanitizedName = String(originalName || 'documento')
+      .replace(/[\\/\r\n]/g, '_')
+      .trim()
+      .slice(0, 255);
+
+    return sanitizedName || 'documento';
   }
 
   createError(status, code, message) {
